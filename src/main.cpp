@@ -1,10 +1,8 @@
-#include <Arduino.h>
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_ADXL345_U.h>
-
-
 /*
+#define accelx A0
+#define accely A1
+#define accelz A2
+
 struct Coordinates
 {
   int x;
@@ -15,35 +13,29 @@ struct Coordinates
 void Calculateservos(int x, int y, int z);
 */
 
-#define accelx A0
-#define accely A1
-#define accelz A2
+#include <Arduino.h>
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
 
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified();
 
-void setup(void) {
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+
+void setup(void) 
+{
   Serial.begin(9600);
-
-  if (!accel.begin()) {
-    Serial.println("No ADXL345 sensor detected.");
-    while (1)
-      ;
-  }
+  
+  accel.begin();
+  accel.setRange(ADXL345_RANGE_4_G);
 }
 
-void loop(void) {
-  Serial.println("test");
-  sensors_event_t event;
+void loop(void) 
+{
+  sensors_event_t event; 
   accel.getEvent(&event);
-  Serial.print("X: ");
-  Serial.print(event.acceleration.x);
-  Serial.print("  ");
-  Serial.print("Y: ");
-  Serial.print(event.acceleration.y);
-  Serial.print("  ");
-  Serial.print("Z: ");
-  Serial.print(event.acceleration.z);
-  Serial.print("  ");
-  Serial.println("m/s^2 ");
+ 
+  Serial.print("X: "); Serial.print(event.acceleration.x); Serial.print("  ");
+  Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print("  ");
+  Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("  ");Serial.println("m/s^2 ");
   delay(500);
 }

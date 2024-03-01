@@ -1,7 +1,16 @@
-/*
-#define accelx A0
-#define accely A1
-#define accelz A2
+#ifdef MAIN
+
+#include <Arduino.h>
+#include <math.h>
+
+#define Larm1 10
+#define Larm2 100
+#define Larmbase 50
+#define Ltop 5
+
+#define starthoek 0
+#define eindhoek 90
+#define marge 2
 
 struct Coordinates
 {
@@ -11,46 +20,57 @@ struct Coordinates
 };
 
 void Calculateservos(int x, int y, int z);
-*/
+void Calculate1(int x, int z);
+void Calculate2(int x, int y, int z);
+void Calculate3(int x, int y, int z);
+int DegreeToRadian(int degree);
 
-#include <Arduino.h>
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_ADXL345_U.h>
-
-
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
-
-float correctX, correctY, correctZ;
-
-void setup(void) 
+void setup()
 {
   Serial.begin(9600);
-  
-  accel.begin();
-  accel.setRange(ADXL345_RANGE_4_G);
 
-  float x = 0.0, y = 0.0, z = 0.0;
-  for(int i = 0; i < 100; i++)
-  {
-    sensors_event_t event; 
-    accel.getEvent(&event);
-    x += event.acceleration.x;
-    y += event.acceleration.y;
-    z += event.acceleration.z;
-  }
-  correctX = x / 100.0;
-  correctY = y / 100.0;
-  correctZ = z / 100.0;
 }
 
-void loop(void) 
+void loop()
 {
-  sensors_event_t event; 
-  accel.getEvent(&event);
- 
-  Serial.print("X: "); Serial.print(event.acceleration.x - correctX); Serial.print("  ");
-  Serial.print("Y: "); Serial.print(event.acceleration.y - correctY); Serial.print("  ");
-  Serial.print("Z: "); Serial.print(event.acceleration.z - correctZ); Serial.print("  ");Serial.println("m/s^2 ");
+  Coordinates coordinates;
+  /*
+  coordinates.x = scanf("Geef x coordinaat: %d", &coordinates.x);
+  coordinates.y = scanf("Geef y coordinaat: %d", &coordinates.y);
+  coordinates.z = scanf("Geef z coordinaat: %d", &coordinates.z);
+  */
+
+  coordinates.x = 10;
+  coordinates.y = 20;
+  coordinates.z = 30;
+  Calculateservos(coordinates.x, coordinates.y, coordinates.z);
   delay(500);
 }
+
+void Calculateservos(int x, int y, int z)
+{
+  Calculate1(x, z);
+}
+
+void Calculate1(int x, int z)
+{
+  int i = starthoek;
+  int xcalc = 0;
+  int zcalc = 0;
+  int distance = 0;
+
+  while((distance < (Larm2 - marge)) || (distance > (Larm2 + marge)))
+  {
+    zcalc = Larm1 + sin(DegreeToRadian(i));
+    xcalc = Larm1 + cos(DegreeToRadian(i));
+    distance = sqrt(pow(x - xcalc, 2) + pow(z - zcalc, 2));
+    i++;
+  }
+  Serial.println(i);
+}
+
+int DegreeToRadian(int degree)
+{
+  return (degree * 71) / 4068;
+}
+#endif

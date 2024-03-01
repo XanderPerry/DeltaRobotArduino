@@ -71,6 +71,6 @@ void Calculate1(int x, int z)
 
 int DegreeToRadian(int degree)
 {
-  return (degree * 71) / 4068;
+  return (degree / 180) * 3.14159265358979323846;
 }
 #endif

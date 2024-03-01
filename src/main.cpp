@@ -1,19 +1,28 @@
 #include <Arduino.h>
+#include <adafruit_ADXL345_U,h>
+
+/*
+struct Coordinates
+{
+  int x;
+  int y;
+  int z;
+};
+
+void Calculateservos(int x, int y, int z);
+*/
+
+#define accelx A0
+#define accely A1
+#define accelz A2
 
 
-// put function declarations here:
-int myFunction(int, int);
-
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+void setup() 
+{
+  
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
+void loop() 
+{
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }

@@ -3,14 +3,17 @@
 #include <Arduino.h>
 #include <math.h>
 
-#define Larm1 10
-#define Larm2 100
-#define Larmbase 50
-#define Ltop 5
+// lengtes in mm
+#define Larm1 50
+#define Larm2 210
+#define Larmbase 100
+#define Ltop 35
 
-#define starthoek 0
+#define starthoek -10
 #define eindhoek 90
-#define marge 2
+#define marge 1
+
+float DegreeToRadian(int degree);
 
 struct Coordinates
 {
@@ -18,12 +21,6 @@ struct Coordinates
   int y;
   int z;
 };
-
-void Calculateservos(int x, int y, int z);
-void Calculate1(int x, int z);
-void Calculate2(int x, int y, int z);
-void Calculate3(int x, int y, int z);
-int DegreeToRadian(int degree);
 
 void setup()
 {
@@ -33,44 +30,12 @@ void setup()
 
 void loop()
 {
-  Coordinates coordinates;
-  /*
-  coordinates.x = scanf("Geef x coordinaat: %d", &coordinates.x);
-  coordinates.y = scanf("Geef y coordinaat: %d", &coordinates.y);
-  coordinates.z = scanf("Geef z coordinaat: %d", &coordinates.z);
-  */
-
-  coordinates.x = 10;
-  coordinates.y = 20;
-  coordinates.z = 30;
-  Calculateservos(coordinates.x, coordinates.y, coordinates.z);
-  delay(500);
+  
 }
 
-void Calculateservos(int x, int y, int z)
+// geeft van een int in graden een float in radialen met 2 decimalen
+float DegreeToRadian(int degree)
 {
-  Calculate1(x, z);
-}
-
-void Calculate1(int x, int z)
-{
-  int i = starthoek;
-  int xcalc = 0;
-  int zcalc = 0;
-  int distance = 0;
-
-  while((distance < (Larm2 - marge)) || (distance > (Larm2 + marge)))
-  {
-    zcalc = Larm1 + sin(DegreeToRadian(i));
-    xcalc = Larm1 + cos(DegreeToRadian(i));
-    distance = sqrt(pow(x - xcalc, 2) + pow(z - zcalc, 2));
-    i++;
-  }
-  Serial.println(i);
-}
-
-int DegreeToRadian(int degree)
-{
-  return (degree / 180) * 3.14159265358979323846;
+  return (float(degree) / 180.0000) * 3.14159265358979323846;
 }
 #endif

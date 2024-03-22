@@ -12,7 +12,7 @@
 
 #define starthoek -30
 #define eindhoek 70
-#define marge 2
+#define marge 1
 
 struct Coordinates
 {
@@ -112,18 +112,21 @@ char calc_arm1(Coordinates coords)
   int x_servo = 0 + Larmbase;
   int z_servo = 0;
 
-  for(char i = starthoek; i < eindhoek; i++)
+  for(char j = 0; j < 4; j++)
   {
-    int z_elleboog = z_servo + Larm1 * sin(DegreeToRadian(i));
-    int x_elleboog = x_servo + Larm1 * cos(DegreeToRadian(i));
-    int afstand = sqrt(pow(x - x_elleboog, 2) + pow(z - z_elleboog, 2));
-
-    if((afstand - marge < Larm2) && (afstand + marge > Larm2))
+    for(char i = starthoek; i < eindhoek; i++)
     {
-      // Serial.print("Oplossing gevonden, hoek 1 is: ");
-      // Serial.print(i);
-      // Serial.println(" graden!");
-      return i;
+      int z_elleboog = z_servo + Larm1 * sin(DegreeToRadian(i));
+      int x_elleboog = x_servo + Larm1 * cos(DegreeToRadian(i));
+      int afstand = sqrt(pow(x - x_elleboog, 2) + pow(z - z_elleboog, 2));
+
+      if((afstand - (marge + j) < Larm2) && (afstand + (marge + j) > Larm2))
+      {
+        // Serial.print("Oplossing gevonden, hoek 1 is: ");
+        // Serial.print(i);
+        // Serial.println(" graden!");
+        return i;
+      }
     }
   }
   Serial.println("Geen oplossing gevonden");
@@ -140,21 +143,25 @@ char calc_arm2(Coordinates coords)
   int y_servo = sin(DegreeToRadian(60)) * Larmbase;
   int z_servo = 0;
 
-  for(char i = starthoek; i < eindhoek; i++)
+  for(char j = 0; j < 4; j++)
   {
-    int x_elleboog = x_servo - cos(DegreeToRadian(60)) * Larm1 * cos(DegreeToRadian(i));
-    int y_elleboog = y_servo + sin(DegreeToRadian(60)) * Larm1 * cos(DegreeToRadian(i));
-    int z_elleboog = z_servo + Larm1 * sin(DegreeToRadian(i));
-    int afstand = sqrt(pow(x - x_elleboog, 2) + pow(y - y_elleboog, 2) + pow(z - z_elleboog, 2));
-
-    if((afstand - marge < Larm2) && (afstand + marge > Larm2))
+    for(char i = starthoek; i < eindhoek; i++)
     {
-      // Serial.print("Oplossing gevonden, hoek 2 is: ");
-      // Serial.print(i + 0);
-      // Serial.println(" graden!");
-      return i;
+      int x_elleboog = x_servo - cos(DegreeToRadian(60)) * Larm1 * cos(DegreeToRadian(i));
+      int y_elleboog = y_servo + sin(DegreeToRadian(60)) * Larm1 * cos(DegreeToRadian(i));
+      int z_elleboog = z_servo + Larm1 * sin(DegreeToRadian(i));
+      int afstand = sqrt(pow(x - x_elleboog, 2) + pow(y - y_elleboog, 2) + pow(z - z_elleboog, 2));
+
+      if((afstand - (marge + j) < Larm2) && (afstand + (marge + j) > Larm2))
+      {
+        // Serial.print("Oplossing gevonden, hoek 2 is: ");
+        // Serial.print(i + 0);
+        // Serial.println(" graden!");
+        return i;
+      }
     }
   }
+  
   Serial.println("Geen oplossing gevonden");
   return 0;
 }
@@ -169,21 +176,25 @@ char calc_arm3(Coordinates coords)
   int y_servo = -sin(DegreeToRadian(60)) * Larmbase;
   int z_servo = 0;
 
-  for(char i = starthoek; i < eindhoek; i++)
+  for(char j = 0; j < 4; j++)
   {
-    int x_elleboog = x_servo - cos(DegreeToRadian(60)) * Larm1 * cos(DegreeToRadian(i));
-    int y_elleboog = y_servo - sin (DegreeToRadian(60)) * Larm1 * cos(DegreeToRadian(i));
-    int z_elleboog = z_servo + Larm1 * sin(DegreeToRadian(i));
-    int afstand = sqrt(pow(x - x_elleboog, 2) + pow(y - y_elleboog, 2) + pow(z - z_elleboog, 2));
-
-    if((afstand - marge < Larm2) && (afstand + marge > Larm2))
+    for(char i = starthoek; i < eindhoek; i++)
     {
-      // Serial.print("Oplossing gevonden, hoek 3 is: ");
-      // Serial.print(i);
-      // Serial.println(" graden!");
-      return i;
+      int x_elleboog = x_servo - cos(DegreeToRadian(60)) * Larm1 * cos(DegreeToRadian(i));
+      int y_elleboog = y_servo - sin (DegreeToRadian(60)) * Larm1 * cos(DegreeToRadian(i));
+      int z_elleboog = z_servo + Larm1 * sin(DegreeToRadian(i));
+      int afstand = sqrt(pow(x - x_elleboog, 2) + pow(y - y_elleboog, 2) + pow(z - z_elleboog, 2));
+
+      if((afstand - (marge + j) < Larm2) && (afstand + (marge + j) > Larm2))
+      {
+        // Serial.print("Oplossing gevonden, hoek 3 is: ");
+        // Serial.print(i);
+        // Serial.println(" graden!");
+        return i;
+      }
     }
   }
+
   Serial.println("Geen oplossing gevonden");
   return 0;
 }

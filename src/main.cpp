@@ -42,7 +42,7 @@ void servos(Angles angles);
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   servo1.attach(9);
   servo2.attach(10);

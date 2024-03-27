@@ -12,13 +12,13 @@
 #define Ltop 35
 
 #define starthoek -30
-#define eindhoek 70
+#define eindhoek 80
 #define marge 1
 
 #define motorspeed 5
 #define fill 1
 #define empty 0
-#define millilitre 1000
+#define millilitre 100
 
 Stepper stepper1(1000, 8, 9, 10, 11);
 Stepper stepper2(1000, 2, 7, 4, 1);
@@ -49,6 +49,22 @@ char calc_arm3(Coordinates coords);
 Angles calc_angles(Coordinates coords);
 void servos(Angles angles);
 void move(Coordinates coords);
+void stepper(int steps, char direction);
+void pipette(char amount_ml, char direction);
+void rinse(void);
+
+Coordinates cup1 = {-70, 15, 200};
+Coordinates cup1_above = {-70, 15, 180};
+Coordinates cup2 = {-30, 50, 200};
+Coordinates cup2_above = {-30, 50, 180};
+Coordinates waste = {45, 30, 200};
+Coordinates waste_above = {45, 30, 180};
+Coordinates tube1 = {-16, -76, 200};
+Coordinates tube1_above = {-16, -76, 180};
+Coordinates tube2 = {5, -64, 200};
+Coordinates tube2_above = {5, -64, 180};
+Coordinates tube3 = {33, -48, 200};
+Coordinates tube3_above = {33, -48, 180};
 
 void setup()
 {
@@ -61,26 +77,13 @@ void setup()
   stepper1.setSpeed(motorspeed);
   stepper2.setSpeed(motorspeed);
 
-  Angles angles_test = {0, 0, 0};
-  servos(angles_test);
-
+  move({0, 0, 180});
+  delay(2000);
 }
 
 void loop()
 {
-  Coordinates cup1 = {0, 0, 0};
-  Coordinates cup1_above = {0, 0, 0};
-  Coordinates cup2 = {0, 0, 0};
-  Coordinates cup2_above = {0, 0, 0};
-  Coordinates waste = {0, 0, 0};
-  Coordinates waste_above = {0, 0, 0};
-  Coordinates tube1 = {0, 0, 0};
-  Coordinates tube1_above = {0, 0, 0};
-  Coordinates tube2 = {0, 0, 0};
-  Coordinates tube2_above = {0, 0, 0};
-  Coordinates tube3 = {0, 0, 0};
-  Coordinates tube3_above = {0, 0, 0};
-
+  // tube 1 -> cup1 cup2 1:2
   move(cup1_above);
   move(cup1);
   pipette(1, fill);
@@ -90,6 +93,8 @@ void loop()
   move(tube1);
   pipette(1, empty);
   move(tube1_above);
+
+  rinse();
 
   move(cup2_above);
   move(cup2);
@@ -101,8 +106,60 @@ void loop()
   pipette(1, empty);
   move(tube1_above);
 
+  rinse();
 
+// tube 2 -> cup1 cup2 1:1
+  move(cup1_above);
+  move(cup1);
+  pipette(1, fill);
+  move(cup1_above);
 
+  move(tube1_above);
+  move(tube1);
+  pipette(1, empty);
+  move(tube1_above);
+
+  rinse();
+
+  move(cup2_above);
+  move(cup2);
+  pipette(1, fill);
+  move(cup2_above);
+
+  move(tube1_above);
+  move(tube1);
+  pipette(1, empty);
+  move(tube1_above);
+
+  rinse();
+
+// tube 2 -> cup1 cup2 2:1
+  move(cup1_above);
+  move(cup1);
+  pipette(2, fill);
+  move(cup1_above);
+
+  move(tube1_above);
+  move(tube1);
+  pipette(2, empty);
+  move(tube1_above);
+
+  rinse();
+
+  move(cup2_above);
+  move(cup2);
+  pipette(1, fill);
+  move(cup2_above);
+
+  move(tube1_above);
+  move(tube1);
+  pipette(1, empty);
+  move(tube1_above);
+
+  rinse();
+
+  move({0, 0, 180});
+  delay(5000);
 }
 
 // geeft van een int in graden een float in radialen met 2 decimalen
@@ -247,6 +304,7 @@ void move(Coordinates coords)
 {
   Angles angles = calc_angles(coords);
   servos(angles);
+  delay(500);
 }
 
 void stepper(int steps, char direction)
@@ -257,6 +315,7 @@ void stepper(int steps, char direction)
     {
       stepper1.step(1);
       stepper2.step(1);
+      delayMicroseconds(10);
     }
   }
   else if(direction == 1) // up
@@ -265,6 +324,7 @@ void stepper(int steps, char direction)
     {
       stepper1.step(-1);
       stepper2.step(-1);
+      delayMicroseconds(10);
     }
   }
 }
@@ -273,6 +333,15 @@ void pipette(char amount_ml, char direction)
 {
   int steps = amount_ml * millilitre;
   stepper(steps, direction);
+}
+
+void rinse()
+{
+  move(waste_above);
+  move(waste);
+  pipette(1, fill);
+  pipette(1, empty);
+  move(waste_above);
 }
 
 #endif

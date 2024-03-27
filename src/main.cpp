@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include <servo.h>
+#include <stepper.h>
 
 // lengtes in mm
 #define Larm1 50
@@ -13,6 +14,14 @@
 #define starthoek -30
 #define eindhoek 70
 #define marge 1
+
+#define motorspeed 5
+#define fill 1
+#define empty 0
+#define millilitre 1000
+
+Stepper stepper1(1000, 8, 9, 10, 11);
+Stepper stepper2(1000, 2, 7, 4, 1);
 
 struct Coordinates
 {
@@ -39,14 +48,18 @@ char calc_arm2(Coordinates coords);
 char calc_arm3(Coordinates coords);
 Angles calc_angles(Coordinates coords);
 void servos(Angles angles);
+void move(Coordinates coords);
 
 void setup()
 {
   Serial.begin(9600);
 
-  servo1.attach(9);
-  servo2.attach(10);
-  servo3.attach(11);
+  servo1.attach(3);
+  servo2.attach(5);
+  servo3.attach(6);
+
+  stepper1.setSpeed(motorspeed);
+  stepper2.setSpeed(motorspeed);
 
   Angles angles_test = {0, 0, 0};
   servos(angles_test);
@@ -55,26 +68,41 @@ void setup()
 
 void loop()
 {
-  Coordinates coord = ask_coordinates();
-  Serial.print("x: ");
-  Serial.println(coord.x);
-  Serial.print("y: ");
-  Serial.println(coord.y);
-  Serial.print("z: ");
-  Serial.println(coord.z);
+  Coordinates cup1 = {0, 0, 0};
+  Coordinates cup1_above = {0, 0, 0};
+  Coordinates cup2 = {0, 0, 0};
+  Coordinates cup2_above = {0, 0, 0};
+  Coordinates waste = {0, 0, 0};
+  Coordinates waste_above = {0, 0, 0};
+  Coordinates tube1 = {0, 0, 0};
+  Coordinates tube1_above = {0, 0, 0};
+  Coordinates tube2 = {0, 0, 0};
+  Coordinates tube2_above = {0, 0, 0};
+  Coordinates tube3 = {0, 0, 0};
+  Coordinates tube3_above = {0, 0, 0};
 
-  Angles angles = calc_angles(coord);
-  Serial.print("hoek1: ");
-  Serial.println(angles.hoek1);
-  Serial.print("hoek2: ");
-  Serial.println(angles.hoek2);
-  Serial.print("hoek3: ");
-  Serial.println(angles.hoek3);
-  Serial.println("");
+  move(cup1_above);
+  move(cup1);
+  pipette(1, fill);
+  move(cup1_above);
 
-  servos(angles);
+  move(tube1_above);
+  move(tube1);
+  pipette(1, empty);
+  move(tube1_above);
 
-  delay(2000);
+  move(cup2_above);
+  move(cup2);
+  pipette(2, fill);
+  move(cup2_above);
+
+  move(tube1_above);
+  move(tube1);
+  pipette(1, empty);
+  move(tube1_above);
+
+
+
 }
 
 // geeft van een int in graden een float in radialen met 2 decimalen
@@ -213,6 +241,38 @@ void servos(Angles angles)
   servo1.write(-angles.hoek1 + 105);
   servo2.write(-angles.hoek2 + 105);
   servo3.write(-angles.hoek3 + 105);
+}
+
+void move(Coordinates coords)
+{
+  Angles angles = calc_angles(coords);
+  servos(angles);
+}
+
+void stepper(int steps, char direction)
+{
+  if(direction == 0) // down
+  {
+    for(int i = 0; i < steps; i++)
+    {
+      stepper1.step(1);
+      stepper2.step(1);
+    }
+  }
+  else if(direction == 1) // up
+  {
+    for(int i = 0; i < steps; i++)
+    {
+      stepper1.step(-1);
+      stepper2.step(-1);
+    }
+  }
+}
+
+void pipette(char amount_ml, char direction)
+{
+  int steps = amount_ml * millilitre;
+  stepper(steps, direction);
 }
 
 #endif
